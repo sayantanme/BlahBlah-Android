@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:paddingLeft="16dp"
+    android:gravity="center_vertical|start"
+    android:id="@+id/contact_list_container"
+    android:weightSum="1">
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:tint="@color/colorPrimary"
+        android:background="@drawable/img"
+        android:id="@+id/im_contact_icon" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:text="Sayantan Chakraborty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:textSize="20dp"
+            android:id="@+id/contact_list_tv" />
+        <TextView
+            android:text="Sayantan Chakraborty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+
+            android:id="@+id/contact_list_tv_detail" />
+
+    </LinearLayout>
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:srcCompat="@android:drawable/ic_menu_help"-->
+        <!--android:tint="@color/colorPrimary"-->
+        <!--android:id="@+id/im_contact_icon_detail" -->
+        <!--android:paddingRight="8dp"/>-->
+
+
+</LinearLayout>

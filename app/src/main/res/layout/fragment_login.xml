@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.sayantanchakraborty.blahblah.LoginAndSignUpActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"
+        android:scaleType="fitXY"
+        android:src="@drawable/images" />
+
+    <EditText
+        android:layout_width="220dp"
+        android:layout_height="30dp"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:hint="Email"
+        android:background="@drawable/text_rounded"
+        android:id="@+id/email"
+        android:textAlignment="center" />
+
+    <EditText
+        android:layout_width="220dp"
+        android:layout_height="30dp"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:background="@drawable/text_rounded"
+        android:hint="Password"
+        android:id="@+id/password"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/email"
+        android:layout_alignStart="@+id/email"
+        android:textAlignment="center" />
+
+    <Button
+        android:text="Sign In"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:layout_below="@+id/password"
+        android:background="@drawable/button_style"
+        android:layout_alignStart="@+id/password"
+        android:layout_marginTop="22dp"
+        android:layout_alignEnd="@+id/password"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        />
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/or_line"
+        android:layout_marginTop="29dp"
+        android:id="@+id/imageView4"
+        android:layout_below="@+id/button2"
+        android:layout_centerHorizontal="true" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView4"
+        android:layout_marginTop="19dp"
+        android:layout_alignStart="@+id/button2"
+        android:layout_alignEnd="@+id/button2"></com.google.android.gms.common.SignInButton>
+
+</RelativeLayout>
