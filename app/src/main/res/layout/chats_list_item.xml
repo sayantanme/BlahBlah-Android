@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:paddingLeft="16dp"
+    android:gravity="center_vertical|start"
+    android:id="@+id/chat_list_container"
+    android:weightSum="1">
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:tint="@color/colorPrimary"
+        android:background="@drawable/img"
+        android:id="@+id/im_contact_icon_chats" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/linLay">
+        <TextView
+            android:text="Sayantan Chakraborty"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:textSize="20dp"
+            android:id="@+id/contact_list_tv_chats" />
+        <TextView
+            android:text="Sayantan Chakraborty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:maxLines="2"
+            android:id="@+id/contact_list_tv_detail_chats" />
+
+    </LinearLayout>
+    <TextView
+        android:text="Sayantan"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:paddingLeft="24dp"
+
+        android:id="@+id/contact_list_tv_date_chats" />
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:srcCompat="@android:drawable/ic_menu_help"-->
+        <!--android:tint="@color/colorPrimary"-->
+        <!--android:id="@+id/im_contact_icon_detail" -->
+        <!--android:paddingRight="8dp"/>-->
+
+
+</LinearLayout>
