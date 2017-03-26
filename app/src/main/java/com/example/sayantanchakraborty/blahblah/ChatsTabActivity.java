@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+
+import org.cryptonode.jncryptor.AES256JNCryptor;
+import org.cryptonode.jncryptor.CryptorException;
+import org.cryptonode.jncryptor.JNCryptor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +64,7 @@ public class ChatsTabActivity extends Fragment {
         }
     };
     private Context context;
+    private  String password = "ABCD1234EFGH5678IJKL9012MNOP3456";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
@@ -102,7 +109,13 @@ public class ChatsTabActivity extends Fragment {
                                 message.setSenderTo(messages.get("SenderTo").toString());
                                 message.setMessageType(messages.get("MessageType").toString());
                                 message.setImageUrl(messages.get("ImageUrl").toString());
-                                message.setText(messages.get("Text").toString());
+                                if (!TextUtils.isEmpty(messages.get("Text").toString())) {
+                                    String decryptedText = decryptText(messages.get("Text").toString());
+                                    message.setText(decryptedText);
+                                }else{
+
+                                    message.setText(messages.get("Text").toString());
+                                }
 
                                 String chatPartnerId = message.chatPartnerId();
                                 messagesDict.put(chatPartnerId,message);
@@ -206,6 +219,20 @@ public class ChatsTabActivity extends Fragment {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
+    }
+
+    private String decryptText(String inputText){
+        JNCryptor cryptor = new AES256JNCryptor();
+        byte[] plaintext = Base64.decode(inputText.getBytes(),Base64.DEFAULT);
+
+        byte[] ciphertext = plaintext;
+        try {
+            ciphertext = cryptor.decryptData(plaintext,password.toCharArray());
+        }catch (CryptorException ex){
+            ex.printStackTrace();
+        }
+        return new String(ciphertext);
+        //Base64.encodeToString(ciphertext,Base64.DEFAULT);
     }
 
 }

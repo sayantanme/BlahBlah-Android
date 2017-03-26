@@ -17,6 +17,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
 }
 
 dependencies {
@@ -35,5 +37,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.0.1'
     compile 'com.firebaseui:firebase-ui-database:1.0.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.scottyab:aescrypt:0.0.1'
+    compile group: 'org.cryptonode.jncryptor', name: 'jncryptor', version: '1.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,11 +50,21 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.scottyab.aescrypt.AESCrypt;
+
+import org.cryptonode.jncryptor.AES256JNCryptor;
+import org.cryptonode.jncryptor.CryptorException;
+import org.cryptonode.jncryptor.JNCryptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.crypto.spec.IvParameterSpec;
 
 public class ChatMessagingActivity extends AppCompatActivity {
 
@@ -68,7 +79,7 @@ public class ChatMessagingActivity extends AppCompatActivity {
     ImageButton imgButtonSend;
     ImageButton imgButtonBack;
     TextView imageTxt;
-
+    private  String password = "ABCD1234EFGH5678IJKL9012MNOP3456";
     public static int GALLERY_INTENT =2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +165,8 @@ public class ChatMessagingActivity extends AppCompatActivity {
         HashMap<String,Object> map = new HashMap<>();
         map.put("SenderFrom",FirebaseAuth.getInstance().getCurrentUser().getUid());
         map.put("SenderTo",user.getId());
-        map.put("Text",imageTxt.getText().toString());
+        String encryptedText = encryptText(imageTxt.getText().toString());
+        map.put("Text", encryptedText);
         map.put("MessageType","TEXT");
         map.put("TimeStamp",System.currentTimeMillis());
         map.put("ImageUrl","");
@@ -216,7 +228,31 @@ public class ChatMessagingActivity extends AppCompatActivity {
         });
     }
 
+    private String encryptText(String inputText){
+        JNCryptor cryptor = new AES256JNCryptor();
+        byte[] plaintext = inputText.getBytes();
+        byte[] ciphertext = plaintext;
+        try {
+            ciphertext = cryptor.encryptData(plaintext,password.toCharArray());
+        }catch (CryptorException ex){
+            ex.printStackTrace();
+        }
+        return Base64.encodeToString(ciphertext,Base64.DEFAULT);
+    }
 
+    private String decryptText(String inputText){
+        JNCryptor cryptor = new AES256JNCryptor();
+        byte[] plaintext = Base64.decode(inputText.getBytes(),Base64.DEFAULT);
+
+        byte[] ciphertext = plaintext;
+        try {
+            ciphertext = cryptor.decryptData(plaintext,password.toCharArray());
+        }catch (CryptorException ex){
+            ex.printStackTrace();
+        }
+        return new String(ciphertext);
+                //Base64.encodeToString(ciphertext,Base64.DEFAULT);
+    }
     private void observeMessages() {
         linearlayout = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearlayout);
@@ -244,7 +280,13 @@ public class ChatMessagingActivity extends AppCompatActivity {
                                 message.setSenderTo(messages.get("SenderTo").toString());
                                 message.setMessageType(messages.get("MessageType").toString());
                                 message.setImageUrl(messages.get("ImageUrl").toString());
-                                message.setText(messages.get("Text").toString());
+                                if (!TextUtils.isEmpty(messages.get("Text").toString())) {
+                                    String decryptedText = decryptText(messages.get("Text").toString());
+                                    message.setText(decryptedText);
+                                }else{
+
+                                    message.setText(messages.get("Text").toString());
+                                }
 
                                 if (message.chatPartnerId().contentEquals(user.getId()))
                                     messagesList.add(message);
