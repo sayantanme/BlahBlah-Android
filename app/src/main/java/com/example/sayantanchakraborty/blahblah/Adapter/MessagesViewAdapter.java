@@ -1,11 +1,15 @@
 package com.example.sayantanchakraborty.blahblah.Adapter;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +26,7 @@ import com.example.sayantanchakraborty.blahblah.ChatMessagingActivity;
 import com.example.sayantanchakraborty.blahblah.Model.Message;
 import com.example.sayantanchakraborty.blahblah.Model.User;
 import com.example.sayantanchakraborty.blahblah.R;
+import com.example.sayantanchakraborty.blahblah.WorkFlowTabbedActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +39,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+
 /**
  * Created by sayantanchakraborty on 17/03/17.
  */
@@ -43,7 +50,7 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private ArrayList<Message> msgList;
     private Context context;
-    private HashMap<String,Message> msgHash;
+    private HashMap<String, Message> msgHash;
     //private User user;
 
     public MessagesViewAdapter(ArrayList<Message> msgList, Context context) {
@@ -51,9 +58,10 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.context = context;
         //this.user = user;
     }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view1 = LayoutInflater.from(parent.getContext()).inflate(R.layout.chats_list_item,parent,false);
+        View view1 = LayoutInflater.from(parent.getContext()).inflate(R.layout.chats_list_item, parent, false);
         return new MessagesViewAdapter.ChatsViewHolder(view1);
     }
 
@@ -64,20 +72,23 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final MessagesViewAdapter.ChatsViewHolder vW1 = (MessagesViewAdapter.ChatsViewHolder)holder;
+        final MessagesViewAdapter.ChatsViewHolder vW1 = (MessagesViewAdapter.ChatsViewHolder) holder;
         //Message msg = msgHash.
-        Message msg1 = msgList.get(position);
+        final String displayName;
+        int timestamp;
+        final Message msg1 = msgList.get(position);
         String id = msg1.chatPartnerId();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final String key = dataSnapshot.getKey();
-                HashMap<String, Object> messages = (HashMap<String, Object>) dataSnapshot.getValue();
-                vW1.contactName.setText(messages.get("displayName").toString());
-                String profileUrl = messages.get("profileUrl").toString();
+                HashMap<String, Object> users = (HashMap<String, Object>) dataSnapshot.getValue();
+                vW1.contactName.setText(users.get("displayName").toString());
+                //displayName = users.get("displayName").toString();
+                String profileUrl = users.get("profileUrl").toString();
                 if (!TextUtils.isEmpty(profileUrl))
-                    Glide.with(context).load(profileUrl).asBitmap().centerCrop().into(new BitmapImageViewTarget(vW1.contactImage){
+                    Glide.with(context).load(profileUrl).asBitmap().centerCrop().into(new BitmapImageViewTarget(vW1.contactImage) {
                         @Override
                         protected void setResource(Bitmap resource) {
                             RoundedBitmapDrawable circularBitmapDrawable =
@@ -86,6 +97,7 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             vW1.contactImage.setImageDrawable(circularBitmapDrawable);
                         }
                     });
+                buildNotification(msg1.getText(),(int)(long)users.get("timestamp"),users.get("displayName").toString());
                 vW1.continerView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -93,7 +105,7 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 User user = dataSnapshot.getValue(User.class);
-                                Log.d("ContactsTabActivity",dataSnapshot.toString());
+                                Log.d("ContactsTabActivity", dataSnapshot.toString());
                                 Intent intent = new Intent(context, ChatMessagingActivity.class);
                                 Bundle b = new Bundle();
                                 b.putSerializable("User", user);
@@ -106,7 +118,7 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                             }
                         });
-                        Toast.makeText(context,key,Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, key, Toast.LENGTH_LONG).show();
 
                     }
                 });
@@ -119,7 +131,7 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         });
 
         vW1.lastMessage.setText(msg1.getText());
-        vW1.chatMessageDate.setText(getDate(msg1.getTimestamp(),"hh:mm a"));
+        vW1.chatMessageDate.setText(getDate(msg1.getTimestamp(), "hh:mm a"));
     }
 
     public static class ChatsViewHolder extends RecyclerView.ViewHolder {
@@ -128,18 +140,18 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView chatMessageDate;
         public ImageView contactImage;
         public View continerView;
+
         public ChatsViewHolder(View itemView) {
             super(itemView);
-            contactName = (TextView)itemView.findViewById(R.id.contact_list_tv_chats);
-            lastMessage = (TextView)itemView.findViewById(R.id.contact_list_tv_detail_chats);
-            chatMessageDate = (TextView)itemView.findViewById(R.id.contact_list_tv_date_chats);
-            contactImage = (ImageView)itemView.findViewById(R.id.im_contact_icon_chats);
+            contactName = (TextView) itemView.findViewById(R.id.contact_list_tv_chats);
+            lastMessage = (TextView) itemView.findViewById(R.id.contact_list_tv_detail_chats);
+            chatMessageDate = (TextView) itemView.findViewById(R.id.contact_list_tv_date_chats);
+            contactImage = (ImageView) itemView.findViewById(R.id.im_contact_icon_chats);
             continerView = itemView.findViewById(R.id.chat_list_container);
         }
     }
 
-    public static String getDate(long milliSeconds, String dateFormat)
-    {
+    public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
@@ -147,5 +159,32 @@ public class MessagesViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
+    }
+
+    private void buildNotification(String message, int id, String displayName) {
+        NotificationCompat.Builder mBuilder =
+                (android.support.v7.app.NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .setContentTitle(displayName)
+                        .setContentText(message);
+
+        int mNotificationId = id;
+        Intent resultIntent = new Intent(context, WorkFlowTabbedActivity.class);
+
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(WorkFlowTabbedActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+
     }
 }

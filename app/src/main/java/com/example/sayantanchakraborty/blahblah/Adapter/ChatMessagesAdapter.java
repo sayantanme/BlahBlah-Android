@@ -1,6 +1,8 @@
 package com.example.sayantanchakraborty.blahblah.Adapter;
 
+import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -26,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by sayantanchakraborty on 25/02/17.
@@ -285,4 +289,5 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
+
 }

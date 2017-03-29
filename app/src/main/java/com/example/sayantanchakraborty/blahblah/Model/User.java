@@ -11,16 +11,26 @@ public class User extends Object implements Serializable {
     public String email;
     public String profileUrl;
     public String id;
+    public long timestamp;
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public User(){
 
     }
 
-    public User(String displayName, String email, String profileUrl, String id) {
+    public User(String displayName, String email, String profileUrl, String id,long timestamp) {
         this.displayName = displayName;
         this.email = email;
         this.profileUrl = profileUrl;
         this.id = id;
+        this.timestamp = timestamp;
     }
 
     public String getDisplayName() {

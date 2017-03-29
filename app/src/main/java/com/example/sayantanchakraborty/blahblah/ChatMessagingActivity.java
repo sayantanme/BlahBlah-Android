@@ -1,6 +1,7 @@
 package com.example.sayantanchakraborty.blahblah;
 
 import android.app.ActionBar;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -115,7 +117,7 @@ public class ChatMessagingActivity extends AppCompatActivity {
 
         messagesList = new ArrayList<>();
         recyclerView = (RecyclerView)findViewById(R.id.chat_recycler);
-
+        //recyclerView.setS
 
         mDataBaseRef = FirebaseDatabase.getInstance().getReference().child("user-messages");
         ImageButton imgButtonAdd = (ImageButton)findViewById(R.id.btnaddImage);
@@ -256,6 +258,7 @@ public class ChatMessagingActivity extends AppCompatActivity {
     private void observeMessages() {
         linearlayout = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearlayout);
+        linearlayout.setStackFromEnd(true);
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
@@ -280,22 +283,27 @@ public class ChatMessagingActivity extends AppCompatActivity {
                                 message.setSenderTo(messages.get("SenderTo").toString());
                                 message.setMessageType(messages.get("MessageType").toString());
                                 message.setImageUrl(messages.get("ImageUrl").toString());
-                                if (!TextUtils.isEmpty(messages.get("Text").toString())) {
-                                    String decryptedText = decryptText(messages.get("Text").toString());
+                                String fetchedTexts = messages.get("Text").toString();
+                                if (!TextUtils.isEmpty(fetchedTexts)) {
+                                    String decryptedText = decryptText(fetchedTexts);
+                                    fetchedTexts = decryptedText;
                                     message.setText(decryptedText);
                                 }else{
 
-                                    message.setText(messages.get("Text").toString());
+                                    message.setText(fetchedTexts);
                                 }
 
-                                if (message.chatPartnerId().contentEquals(user.getId()))
+                                if (message.chatPartnerId().contentEquals(user.getId())) {
                                     messagesList.add(message);
+                                   // buildNotification(fetchedTexts,(int)message.getTimestamp());
+                                }
                                 Log.d("ChatMessagingActivity", message.getText());
 
 
                                 //Log.d("ChatMessagingActivity",message.getText());
                                 adapter.notifyDataSetChanged();
                                 recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount());
+                                //recyclerView.sc
 
                             }
 
@@ -369,5 +377,24 @@ public class ChatMessagingActivity extends AppCompatActivity {
                 Log.d("ChatMessagingActivity",e.getLocalizedMessage());
             }
         }
+
+    }
+    private void buildNotification(String message,int id){
+        NotificationCompat.Builder mBuilder =
+                (android.support.v7.app.NotificationCompat.Builder)new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .setContentTitle(user.getDisplayName())
+                        .setContentText(message);
+
+        int mNotificationId = (int) user.getTimestamp();
+//        int color = 0x008000;
+        //mBuilder.setColor(color);
+// Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+// Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+
     }
 }

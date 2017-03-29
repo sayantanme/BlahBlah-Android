@@ -2,6 +2,7 @@ package com.example.sayantanchakraborty.blahblah;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -87,6 +88,7 @@ public class SignUpTab extends Fragment {
                     databaseReference.child("profileUrl").setValue("");
                     databaseReference.child("email").setValue(emailtext);
                     databaseReference.child("password").setValue(password);
+                    databaseReference.child("TimeStamp").setValue(System.currentTimeMillis());
                 }else {
                     Log.w("SignUpTab", "signUpWithEmail:failed", task.getException());
                     Toast.makeText(getActivity(), "Sign in Failed",

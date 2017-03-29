@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +62,11 @@ public class LoginTab extends Fragment implements GoogleApiClient.OnConnectionFa
             @Override
             public void onClick(View v) {
                 Log.d("LoginTab","signInTapped" + emailText.getText());
-                loginWithUserNameAndPassword(emailText.getText().toString(),passText.getText().toString());
+                if(!TextUtils.isEmpty(emailText.getText().toString()) &&  !TextUtils.isEmpty(passText.getText().toString()))
+                    loginWithUserNameAndPassword(emailText.getText().toString(),passText.getText().toString());
+                else
+                    Toast.makeText(getActivity(),"Enter email and password",Toast.LENGTH_LONG).show();
+
             }
         });
 
@@ -188,6 +193,7 @@ public class LoginTab extends Fragment implements GoogleApiClient.OnConnectionFa
                     else
                         databaseReference.child("profileUrl").setValue("");
                     databaseReference.child("email").setValue(account.getEmail());
+                    databaseReference.child("timestamp").setValue(System.currentTimeMillis());
                 }
             }
         });
